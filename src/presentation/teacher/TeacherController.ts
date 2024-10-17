@@ -1,5 +1,6 @@
 import {Request, Response} from 'express';
 import { prima } from "../../data/postgres";
+import { CreateTeacherDto, UpdateTeacherDto } from '../../domain';
 
 
 
@@ -28,15 +29,29 @@ export class TeacheController {
   };
 
   public createTeache =  (req: Request, res: Response) => {
-    const { email, name } = req.body;
-   if (email) res.status(200).json("email, name ");
+    const [error, createteacherDpo] = CreateTeacherDto.create(req.body); ;
+   if (error) res.status(400).json({error});
+
+
+
     res.status(200).json("email, name ");
   };
 
   public updateTeache =  (req: Request, res: Response) => {
-    const { email, name } = req.body;
+    const id = +req.params.id;
+    const [error, updateTeacherDpo] = UpdateTeacherDto.Update({...req.body,id});
+    if (error) res.status(400).json({ error });
 
-    res.status(200).json( "email, name ");
+    let teacher = prima.teacher.update({
+      where: { id: id, delet: false },
+      data: updateTeacherDpo!.values,
+    });
+
+    if (!teacher) {
+      res.status(400).json({ error: "Error profesor no existe" });
+    } 
+    else {res.status(200).json({ teacher });
+    }
   };
 
   public deleteTeache = async (req: Request, res: Response) => {

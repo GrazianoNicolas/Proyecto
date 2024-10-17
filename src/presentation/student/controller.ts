@@ -38,7 +38,7 @@ export class StudentController {
     try {
       const [error, createStudentDto] = CreateStudentDto.create(req.body);
 
-      if (error) return res.status(400).json({ error });
+      if (error)  res.status(400).json({ error });
 
       const oldstudent = await prima.student.findMany({
         where: { email: createStudentDto!.email },
@@ -54,7 +54,7 @@ export class StudentController {
 
       res.status(200).json(newStudent);
     } catch (err) {
-      return res.status(500).json({ error: "Internal server error" });
+       res.status(500).json({ error: "Internal server error" });
     }
   };
 
@@ -63,7 +63,7 @@ export class StudentController {
   public updateStudent = async (req: Request, res: Response) => {
     const id = +req.params.id;
     const [error, updateStudentDto] = UpdateStudentDto.create({ ...req.body,id });
-    if (error) return res.status(400).json({ error });
+    if (error)  res.status(400).json({ error });
 
     const student = await prima.student.update({
       where: { id: id, delet: false },
