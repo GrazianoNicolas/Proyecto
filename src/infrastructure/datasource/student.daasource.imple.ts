@@ -22,8 +22,8 @@ export class StudentDatasourceImpl implements StudentDatasource {
     const studentbyid = await prima.student.findFirst({
       where: { id: id, delet: false },
     });
-
-    return StudentEntity.fromObject(studentbyid);
+throw new Error("Method not implemented.");
+    //return StudentEntity.fromObject(studentbyid);
   }
 
 

@@ -11,6 +11,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.TeacheController = void 0;
 const postgres_1 = require("../../data/postgres");
+const domain_1 = require("../../domain");
 class TeacheController {
     constructor() {
         this.allTeache = (req, res) => __awaiter(this, void 0, void 0, function* () {
@@ -30,15 +31,44 @@ class TeacheController {
                 ? res.json(teacher)
                 : res.status(404).json({ error: "Error profesor no existe" });
         });
-        this.createTeache = (req, res) => {
-            const { email, name } = req.body;
-            if (email)
-                res.status(200).json("email, name ");
-            return res.status(200).json("email, name ");
-        };
+        this.createTeache = (req, res) => __awaiter(this, void 0, void 0, function* () {
+            try {
+                // const [error, createTeacherDto] = CreateTeacherDto.create(req.body);
+                const { email, name } = req.body;
+                if (!name)
+                    res.status(400).json("name property is required");
+                if (!email)
+                    res.status(400).json("email property is required");
+                const oldstudent = yield postgres_1.prima.teacher.findFirst({
+                    where: { email: email },
+                });
+                if (!oldstudent) {
+                    res.status(409).json({ error: "profesor existente" });
+                }
+                const newStudent = yield postgres_1.prima.teacher.create({
+                    data: { email: email, name: name },
+                });
+                res.status(200).json(newStudent);
+            }
+            catch (err) {
+                res.status(500).json({ error: err });
+            }
+        });
         this.updateTeache = (req, res) => {
-            const { email, name } = req.body;
-            return res.status(200).json("email, name ");
+            const id = +req.params.id;
+            const [error, updateTeacherDpo] = domain_1.UpdateTeacherDto.Update(Object.assign(Object.assign({}, req.body), { id }));
+            if (error)
+                res.status(400).json({ error });
+            let teacher = postgres_1.prima.teacher.update({
+                where: { id: id, delet: false },
+                data: updateTeacherDpo.values,
+            });
+            if (!teacher) {
+                res.status(400).json({ error: "Error profesor no existe" });
+            }
+            else {
+                res.status(200).json({ teacher });
+            }
         };
         this.deleteTeache = (req, res) => __awaiter(this, void 0, void 0, function* () {
             const id = +req.params.id;

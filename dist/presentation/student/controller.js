@@ -37,7 +37,7 @@ class StudentController {
             try {
                 const [error, createStudentDto] = dtos_1.CreateStudentDto.create(req.body);
                 if (error)
-                    return res.status(400).json({ error });
+                    res.status(400).json({ error });
                 const oldstudent = yield postgres_1.prima.student.findMany({
                     where: { email: createStudentDto.email },
                 });
@@ -50,7 +50,7 @@ class StudentController {
                 res.status(200).json(newStudent);
             }
             catch (err) {
-                return res.status(500).json({ error: "Internal server error" });
+                res.status(500).json({ error: "Internal server error" });
             }
         });
         // ------------------**************************************************-------
@@ -58,7 +58,7 @@ class StudentController {
             const id = +req.params.id;
             const [error, updateStudentDto] = dtos_1.UpdateStudentDto.create(Object.assign(Object.assign({}, req.body), { id }));
             if (error)
-                return res.status(400).json({ error });
+                res.status(400).json({ error });
             const student = yield postgres_1.prima.student.update({
                 where: { id: id, delet: false },
                 data: updateStudentDto.values,

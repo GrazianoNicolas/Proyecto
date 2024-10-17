@@ -14,7 +14,7 @@ static get routes():Router{
 const router=Router();
 
 router.use("/api/estudiantes", StudentRoutes.routes);
-router.use("/profesores", TeacheRoutes.routes);
+router.use("/api/profesores", TeacheRoutes.routes);
 router.use("/api/inscripciones", RegistrationRoutes.routes);
 router.use("/api/cursos", CourseRoutes.routes);
 

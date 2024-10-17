@@ -28,29 +28,49 @@ export class TeacheController {
       : res.status(404).json({ error: "Error profesor no existe" });
   };
 
-  public createTeache =  (req: Request, res: Response) => {
-    const [error, createteacherDpo] = CreateTeacherDto.create(req.body); ;
-   if (error) res.status(400).json({error});
+  public createTeache = async (req: Request, res: Response) => {
+    
+      // const [error, createTeacherDto] = CreateTeacherDto.create(req.body);
+      const { email, name } = req.body;
+      if (!name) res.status(400).json("name property is required");
+
+      if (!email) res.status(400).json("email property is required");
+      const oldstudent = await prima.teacher.findFirst({
+        where: { email: email },
+      });
 
 
+      if (oldstudent) {
+        res.status(409).json({ error: "ya hay un profesor con ese email" });
+      }else{
+          const newStudent = await prima.teacher.create({
+            data: { email: email, name: name },
+          });
 
-    res.status(200).json("email, name ");
+          res.status(200).json(newStudent);
+      }
+
+    
   };
 
-  public updateTeache =  (req: Request, res: Response) => {
+  public updateTeache = async (req: Request, res: Response) => {
     const id = +req.params.id;
-    const [error, updateTeacherDpo] = UpdateTeacherDto.Update({...req.body,id});
+    const [error, updateTeacherDpo] = UpdateTeacherDto.Update({
+      ...req.body,
+      id,
+    });
     if (error) res.status(400).json({ error });
+    console.log(updateTeacherDpo?.values);
 
-    let teacher = prima.teacher.update({
+    let teacher = await prima.teacher.update({
       where: { id: id, delet: false },
       data: updateTeacherDpo!.values,
     });
 
     if (!teacher) {
       res.status(400).json({ error: "Error profesor no existe" });
-    } 
-    else {res.status(200).json({ teacher });
+    } else {
+      res.status(200).json({ teacher });
     }
   };
 

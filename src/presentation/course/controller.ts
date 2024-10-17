@@ -38,39 +38,37 @@ export class CourseController {
   public createCourse = async (req: Request, res: Response) => {
     const [erro, createCourseDto] = CreateCourserDto.create(req.body);
     if (erro) res.status(400).json({ erro });
-  
-
-
+ 
       const teache = await prima.teacher.findFirst({
         where: { id: createCourseDto!.teacher, delet: false },
       });
 
-if (teache){
-const oldstudent = await prima.course.findMany({
-  where: {
-    name: createCourseDto?.name,
-    teacherId: createCourseDto?.teacher,
-    delet: false,
-  },
-});
+        if (teache){
+            const oldstudent = await prima.course.findFirst({
+              where: {
+                name: createCourseDto!.name,
+                teacherId: createCourseDto!.teacher,
+                delet: false,
+              },
+            });
 
-if (oldstudent) {
-  res.status(404).json({ error: "el curso ya existe" });
-}
+          if (oldstudent) {
+            res.status(404).json({ error: "el curso ya existe" });
+          }else{
+              const newStudent = await prima.course.create({
+                data: {
+                  name: createCourseDto!.name,
+                  teacherId: createCourseDto!.teacher,
+                  description: createCourseDto!.description,
+                  delet: false,
+                },
+              });
 
-const newStudent = await prima.course.create({
-  data: {
-    name: createCourseDto!.name,
-    teacherId: createCourseDto!.teacher,
-    description: createCourseDto!.description,
-    delet: false,
-  },
-});
-
-res.status(200).json(newStudent);
-}else{ 
-  res.status(404).json({ error: "no existe el profesor " });
-};
+              res.status(200).json(newStudent);
+          }
+        }else{ 
+          res.status(404).json({ error: "no existe el profesor " });
+        };
  
 
   };
@@ -85,11 +83,13 @@ res.status(200).json(newStudent);
     const teache = await prima.teacher.findFirst({
       where: { id: updateCourserDto!.teacher, delet: false },
     });
+
+    console.log(teache);
     if (teache) {
 
       const course = await prima.course.update({
         where: { id: id, delet: false },
-        data: updateCourserDto!.values,
+        data: { teacherId: updateCourserDto!.teacher, name:updateCourserDto!.name, description:updateCourserDto?.description },
       });
 
       if (course) {
@@ -109,7 +109,7 @@ res.status(200).json(newStudent);
     if (isNaN(id))
       res.status(400).json({ error: "Id argument is not number " });
 
-    let course = prima.course.update({
+    let course = await prima.course.update({
       where: { id: id, delet: false },
       data: { delet: true },
     });

@@ -9,8 +9,8 @@ export class TeacheRoutes {
     router.get("/", teacheController.allTeache);
     router.get("/:id", teacheController.getTeache);
     router.post("/", teacheController.createTeache);
-    router.delete("/", teacheController.deleteTeache);
-    router.put("/", teacheController.updateTeache);
+    router.delete("/:id", teacheController.deleteTeache);
+    router.put("/:id", teacheController.updateTeache);
 
     return router;
   }

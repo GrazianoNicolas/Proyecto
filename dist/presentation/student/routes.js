@@ -9,8 +9,8 @@ class StudentRoutes {
         const studentController = new controller_1.StudentController();
         router.get("/", studentController.allStudents);
         router.get("/:id", studentController.getStudent);
-        // router.post("/", studentController.createStudent);
-        // router.put("/:id", studentController.updateStudent);
+        router.post("/", studentController.createStudent);
+        router.put("/:id", studentController.updateStudent);
         router.delete("/:id", studentController.deleteStudent);
         return router;
     }

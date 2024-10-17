@@ -10,7 +10,7 @@ class CourseRoutes {
         router.get("/", courseController.allCourse);
         router.get("/:id", courseController.getCourse);
         router.post("/", courseController.createCourse);
-        // router.put("/:id", courseController.updateCourse);
+        router.put("/:id", courseController.updateCourse);
         router.delete("/:id", courseController.deleteCourse);
         return router;
     }

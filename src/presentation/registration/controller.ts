@@ -39,16 +39,14 @@ export class RegistrationController {
     const [error, createRegistrationDto] = CreateRegistrationDto.create( req.body );
     if (error) res.status(400).json({ error });
 
-  
-
     //PREGUNTAR si existe el estudiante y el curso
 
     const course = await prima.course.findFirst({
-      where: { id: createRegistrationDto?.course, delet: false },
+      where: { id: createRegistrationDto!.course, delet: false },
     });
 
     const student = await prima.student.findFirst({
-      where: { id: createRegistrationDto?.student, delet: false },
+      where: { id: createRegistrationDto!.student, delet: false },
     });
 
     if (student && course) {
@@ -66,7 +64,7 @@ export class RegistrationController {
           res.json(newregistration);
 
       } else {
-          res.status(409).json({ error: " ya existe un regristro" });
+          res.status(409).json({ error: " ya existe una inscripcion" });
       }
     } else {
       res.status(404).json({ error: " el estudiante o el curso  no existe" });
@@ -75,42 +73,50 @@ export class RegistrationController {
 
   public updateRegistration = async (req: Request, res: Response) => {
     const id = +req.params.id;
-    const [error,updateRegistrationDto] = UpdateRegistrationDto.create({ ...req.body,id }); 
-    if (error) res.status(400).json({ error });
-    
-    
-//PREGUNTAR si existe el estudiante y el curso 
-
-   const course = await prima.course.findFirst({
-     where: { id: updateRegistrationDto?.course, delet: false },
-   });
-
-  const student = await prima.student.findFirst({
-    where: { id: updateRegistrationDto?.student, delet: false },
-  });
-  
-if (student && course) {
-  const registration = await prima.registration.findFirst({
-    where: { id: id, delet: false },
-  });
-  const olRregistrations = await prima.registration.findFirst({
-    where: { studentId: student.id, courseId: course.id, delet: false },
-  });
-  
-  if (registration && !olRregistrations) {
-    const updateregistration = await prima.registration.update({
-      where: { id: id, delet: false },
-      data: { studentId: student.id, courseId: course.id },
+    const [error, updateRegistrationDto] = UpdateRegistrationDto.create({
+      ...req.body,
+      id,
     });
-    res.json(updateregistration);
-  } else {
-    res
-      .status(404)
-      .json({ error: " la inscripcion no existe o ya tiene una inscripcion en ese curso " });
-  }
-} else {
-  res.status(404).json({ error: " el estudiante o el curso  no existe" });
-}
+    if (error) res.status(400).json({ error });
+
+    //todo PREGUNTAR si existe el estudiante y el curso
+    const course = await prima.course.findFirst({
+      where: { id: updateRegistrationDto!.course, delet: false },
+    });
+
+    const student = await prima.student.findFirst({
+      where: { id: updateRegistrationDto!.student, delet: false },
+    });
+
+    if (student && course) {
+      
+      //todo ME fijo si esta inscripto en una materia existente para que no se halla duplicados
+      const olRregistrations = await prima.registration.findFirst({
+        where: { studentId: student.id, courseId: course.id, delet: false },
+      });
+
+      if (!olRregistrations) {
+        const updateregistration = await prima.registration.update({
+          where: { id: id, delet: false },
+          data: { studentId: student.id, courseId: course.id },
+        });
+
+        if (updateregistration){
+          res.json(updateregistration);
+        }else{
+          res.status(404).json({ error: " no se encontro la inscripcion " });
+        } 
+      } else {
+        res
+          .status(404)
+          .json({
+            error:
+              "ya tiene una inscripcion en ese curso, no puede haber dupliacdos",
+          });
+      }
+    } else {
+      res.status(404).json({ error: " el estudiante o el curso  no existe" });
+    }
   };
 
   public deleteRegistration = async (req: Request, res: Response) => {
@@ -120,7 +126,7 @@ if (student && course) {
     if (isNaN(id))
       res.status(400).json({ error: "Id argument is not number " });
 
-    let registration = prima.registration.update({
+    let registration = await prima.registration.update({
       where: { id: id, delet: false },
       data: { delet: true },
     });

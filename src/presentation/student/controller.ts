@@ -40,19 +40,20 @@ export class StudentController {
 
       if (error)  res.status(400).json({ error });
 
-      const oldstudent = await prima.student.findMany({
+      const oldstudent = await prima.student.findFirst({
         where: { email: createStudentDto!.email },
       });
+        console.log(oldstudent);
 
       if (oldstudent) {
-        res.status(409).json({ error: "estudiante existente" });
+        res.status(409).json({ error: "ya existe un estudiante con ese email" });
+      }else{
+        const newStudent = await prima.student.create({
+          data: {name:createStudentDto!.name, email:createStudentDto!.email}
+        });
+
+        res.status(200).json(newStudent);
       }
-
-      const newStudent = await prima.student.create({
-        data: { email: createStudentDto!.email, name: createStudentDto!.name },
-      });
-
-      res.status(200).json(newStudent);
     } catch (err) {
        res.status(500).json({ error: "Internal server error" });
     }
@@ -86,11 +87,11 @@ export class StudentController {
     if (isNaN(id))
       res.status(400).json({ error: "Id argument is not number " });
 
-    let student = prima.student.update({
+    let student = await prima.student.update({
       where: { id: id, delet: false },
       data: { delet: true },
     });
-
+console.log(student);
     if (student) {
       res.json(student);
     } else {

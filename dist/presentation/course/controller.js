@@ -68,7 +68,7 @@ class CourseController {
             const id = +req.params.id;
             const [error, updateCourserDto] = dtos_1.UpdateCourserDto.update(Object.assign(Object.assign({}, req.body), { id }));
             if (error)
-                return res.status(400).json({ error });
+                res.status(400).json({ error });
             //verificar si existe el profesor
             const teache = yield postgres_1.prima.teacher.findFirst({
                 where: { id: updateCourserDto.teacher, delet: false },

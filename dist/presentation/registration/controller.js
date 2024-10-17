@@ -40,10 +40,10 @@ class RegistrationController {
                 res.status(400).json({ error });
             //PREGUNTAR si existe el estudiante y el curso
             const course = yield postgres_1.prima.course.findFirst({
-                where: { id: createRegistrationDto === null || createRegistrationDto === void 0 ? void 0 : createRegistrationDto.course, delet: false },
+                where: { id: createRegistrationDto.course, delet: false },
             });
             const student = yield postgres_1.prima.student.findFirst({
-                where: { id: createRegistrationDto === null || createRegistrationDto === void 0 ? void 0 : createRegistrationDto.student, delet: false },
+                where: { id: createRegistrationDto.student, delet: false },
             });
             if (student && course) {
                 const registration = yield postgres_1.prima.registration.findFirst({
@@ -56,7 +56,7 @@ class RegistrationController {
                     res.json(newregistration);
                 }
                 else {
-                    res.status(409).json({ error: " ya existe un regristro" });
+                    res.status(409).json({ error: " ya existe una inscripcion" });
                 }
             }
             else {
