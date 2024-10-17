@@ -4,6 +4,10 @@ export class UpdateRegistrationDto {
     public readonly student: number,
     public readonly course: number
   ) {}
+
+
+
+
   get values() {
     const returnObj: { [key: string]: any } = {};
 
@@ -11,6 +15,9 @@ export class UpdateRegistrationDto {
     if (this.course) returnObj.course = this.course;
     return returnObj;
   }
+
+
+  
   static create(props: {
     [key: string]: any;
   }): [string?, UpdateRegistrationDto?] {

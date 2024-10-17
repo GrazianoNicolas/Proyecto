@@ -32,34 +32,32 @@ class TeacheController {
                 : res.status(404).json({ error: "Error profesor no existe" });
         });
         this.createTeache = (req, res) => __awaiter(this, void 0, void 0, function* () {
-            try {
-                // const [error, createTeacherDto] = CreateTeacherDto.create(req.body);
-                const { email, name } = req.body;
-                if (!name)
-                    res.status(400).json("name property is required");
-                if (!email)
-                    res.status(400).json("email property is required");
-                const oldstudent = yield postgres_1.prima.teacher.findFirst({
-                    where: { email: email },
-                });
-                if (!oldstudent) {
-                    res.status(409).json({ error: "profesor existente" });
-                }
+            // const [error, createTeacherDto] = CreateTeacherDto.create(req.body);
+            const { email, name } = req.body;
+            if (!name)
+                res.status(400).json("name property is required");
+            if (!email)
+                res.status(400).json("email property is required");
+            const oldstudent = yield postgres_1.prima.teacher.findFirst({
+                where: { email: email },
+            });
+            if (oldstudent) {
+                res.status(409).json({ error: "ya hay un profesor con ese email" });
+            }
+            else {
                 const newStudent = yield postgres_1.prima.teacher.create({
                     data: { email: email, name: name },
                 });
                 res.status(200).json(newStudent);
             }
-            catch (err) {
-                res.status(500).json({ error: err });
-            }
         });
-        this.updateTeache = (req, res) => {
+        this.updateTeache = (req, res) => __awaiter(this, void 0, void 0, function* () {
             const id = +req.params.id;
             const [error, updateTeacherDpo] = domain_1.UpdateTeacherDto.Update(Object.assign(Object.assign({}, req.body), { id }));
             if (error)
                 res.status(400).json({ error });
-            let teacher = postgres_1.prima.teacher.update({
+            console.log(updateTeacherDpo === null || updateTeacherDpo === void 0 ? void 0 : updateTeacherDpo.values);
+            let teacher = yield postgres_1.prima.teacher.update({
                 where: { id: id, delet: false },
                 data: updateTeacherDpo.values,
             });
@@ -69,7 +67,7 @@ class TeacheController {
             else {
                 res.status(200).json({ teacher });
             }
-        };
+        });
         this.deleteTeache = (req, res) => __awaiter(this, void 0, void 0, function* () {
             const id = +req.params.id;
             if (isNaN(id))

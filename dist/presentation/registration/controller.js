@@ -45,6 +45,8 @@ class RegistrationController {
             const student = yield postgres_1.prima.student.findFirst({
                 where: { id: createRegistrationDto.student, delet: false },
             });
+            console.log(student);
+            console.log(course);
             if (student && course) {
                 const registration = yield postgres_1.prima.registration.findFirst({
                     where: { studentId: student.id, courseId: course.id, delet: false },
@@ -68,31 +70,36 @@ class RegistrationController {
             const [error, updateRegistrationDto] = dtos_1.UpdateRegistrationDto.create(Object.assign(Object.assign({}, req.body), { id }));
             if (error)
                 res.status(400).json({ error });
-            //PREGUNTAR si existe el estudiante y el curso 
+            //todo PREGUNTAR si existe el estudiante y el curso
             const course = yield postgres_1.prima.course.findFirst({
-                where: { id: updateRegistrationDto === null || updateRegistrationDto === void 0 ? void 0 : updateRegistrationDto.course, delet: false },
+                where: { id: updateRegistrationDto.course, delet: false },
             });
             const student = yield postgres_1.prima.student.findFirst({
-                where: { id: updateRegistrationDto === null || updateRegistrationDto === void 0 ? void 0 : updateRegistrationDto.student, delet: false },
+                where: { id: updateRegistrationDto.student, delet: false },
             });
             if (student && course) {
-                const registration = yield postgres_1.prima.registration.findFirst({
-                    where: { id: id, delet: false },
-                });
+                //todo ME fijo si esta inscripto en una materia existente para que no se halla duplicados
                 const olRregistrations = yield postgres_1.prima.registration.findFirst({
                     where: { studentId: student.id, courseId: course.id, delet: false },
                 });
-                if (registration && !olRregistrations) {
+                if (!olRregistrations) {
                     const updateregistration = yield postgres_1.prima.registration.update({
                         where: { id: id, delet: false },
                         data: { studentId: student.id, courseId: course.id },
                     });
-                    res.json(updateregistration);
+                    if (updateregistration) {
+                        res.json(updateregistration);
+                    }
+                    else {
+                        res.status(404).json({ error: " no se encontro la inscripcion " });
+                    }
                 }
                 else {
                     res
                         .status(404)
-                        .json({ error: " la inscripcion no existe o ya tiene una inscripcion en ese curso " });
+                        .json({
+                        error: "ya tiene una inscripcion en ese curso, no puede haber dupliacdos",
+                    });
                 }
             }
             else {
@@ -104,7 +111,7 @@ class RegistrationController {
             const { delet } = req.body;
             if (isNaN(id))
                 res.status(400).json({ error: "Id argument is not number " });
-            let registration = postgres_1.prima.registration.update({
+            let registration = yield postgres_1.prima.registration.update({
                 where: { id: id, delet: false },
                 data: { delet: true },
             });

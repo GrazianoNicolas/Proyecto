@@ -1,6 +1,7 @@
 import {Request, Response} from 'express';
 import { prima } from "../../data/postgres";
 import { CreateRegistrationDto, UpdateRegistrationDto } from '../../domain/dtos';
+import { error } from 'console';
 
 
 // !GET /cursos/:id/estudiantes: Listar los estudiantes inscritos en un curso específico por su id.
@@ -49,6 +50,7 @@ export class RegistrationController {
       where: { id: createRegistrationDto!.student, delet: false },
     });
 
+
     if (student && course) {
 
       const registration = await prima.registration.findFirst({
@@ -88,6 +90,11 @@ export class RegistrationController {
       where: { id: updateRegistrationDto!.student, delet: false },
     });
 
+
+      console.log(course);
+      console.log(student);
+
+
     if (student && course) {
       
       //todo ME fijo si esta inscripto en una materia existente para que no se halla duplicados
@@ -126,15 +133,26 @@ export class RegistrationController {
     if (isNaN(id))
       res.status(400).json({ error: "Id argument is not number " });
 
-    let registration = await prima.registration.update({
-      where: { id: id, delet: false },
-      data: { delet: true },
-    });
+    try{
+      let registration = await prima.registration.findFirst({
+        where: { id: id, delet: false },
+      });
+       console.log(registration);
+      if (registration) {
+            let registration = await prima.registration.update({
+            where: { id: id, delet: false },
+            data: { delet: true },
+          });
+         
 
-    if (!registration) {
       res.json(registration);
     } else {
-      res.status(404).json({ error: "Error el registro no existe" });
+      res.status(404).json({ error: " el registro no existe" });
     }
-  };
+        
+  }catch(error){
+            res.status(500).json({ error: "problema con la conexion " });
+
+  }
+  };  
 }

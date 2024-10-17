@@ -38,16 +38,19 @@ class StudentController {
                 const [error, createStudentDto] = dtos_1.CreateStudentDto.create(req.body);
                 if (error)
                     res.status(400).json({ error });
-                const oldstudent = yield postgres_1.prima.student.findMany({
+                const oldstudent = yield postgres_1.prima.student.findFirst({
                     where: { email: createStudentDto.email },
                 });
+                console.log(oldstudent);
                 if (oldstudent) {
-                    res.status(409).json({ error: "estudiante existente" });
+                    res.status(409).json({ error: "ya existe un estudiante con ese email" });
                 }
-                const newStudent = yield postgres_1.prima.student.create({
-                    data: { email: createStudentDto.email, name: createStudentDto.name },
-                });
-                res.status(200).json(newStudent);
+                else {
+                    const newStudent = yield postgres_1.prima.student.create({
+                        data: { name: createStudentDto.name, email: createStudentDto.email }
+                    });
+                    res.status(200).json(newStudent);
+                }
             }
             catch (err) {
                 res.status(500).json({ error: "Internal server error" });
@@ -76,10 +79,11 @@ class StudentController {
             const { delet } = req.body;
             if (isNaN(id))
                 res.status(400).json({ error: "Id argument is not number " });
-            let student = postgres_1.prima.student.update({
+            let student = yield postgres_1.prima.student.update({
                 where: { id: id, delet: false },
                 data: { delet: true },
             });
+            console.log(student);
             if (student) {
                 res.json(student);
             }

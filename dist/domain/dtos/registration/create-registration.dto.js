@@ -9,9 +9,9 @@ class CreateRegistrationDto {
     static create(props) {
         const { student, course } = props;
         if (!student || isNaN(Number(student)))
-            return ["studentId must be a valid number"];
+            return [" student Id must be a valid number"];
         if (!course || isNaN(Number(course)))
-            return ["courseId must be a valid number"];
+            return ["course Id must be a valid number"];
         return [undefined, new CreateRegistrationDto(student, course)];
     }
 }

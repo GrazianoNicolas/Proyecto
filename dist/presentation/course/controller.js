@@ -39,25 +39,27 @@ class CourseController {
                 where: { id: createCourseDto.teacher, delet: false },
             });
             if (teache) {
-                const oldstudent = yield postgres_1.prima.course.findMany({
+                const oldstudent = yield postgres_1.prima.course.findFirst({
                     where: {
-                        name: createCourseDto === null || createCourseDto === void 0 ? void 0 : createCourseDto.name,
-                        teacherId: createCourseDto === null || createCourseDto === void 0 ? void 0 : createCourseDto.teacher,
+                        name: createCourseDto.name,
+                        teacherId: createCourseDto.teacher,
                         delet: false,
                     },
                 });
                 if (oldstudent) {
                     res.status(404).json({ error: "el curso ya existe" });
                 }
-                const newStudent = yield postgres_1.prima.course.create({
-                    data: {
-                        name: createCourseDto.name,
-                        teacherId: createCourseDto.teacher,
-                        description: createCourseDto.description,
-                        delet: false,
-                    },
-                });
-                res.status(200).json(newStudent);
+                else {
+                    const newStudent = yield postgres_1.prima.course.create({
+                        data: {
+                            name: createCourseDto.name,
+                            teacherId: createCourseDto.teacher,
+                            description: createCourseDto.description,
+                            delet: false,
+                        },
+                    });
+                    res.status(200).json(newStudent);
+                }
             }
             else {
                 res.status(404).json({ error: "no existe el profesor " });
@@ -73,10 +75,11 @@ class CourseController {
             const teache = yield postgres_1.prima.teacher.findFirst({
                 where: { id: updateCourserDto.teacher, delet: false },
             });
+            console.log(teache);
             if (teache) {
                 const course = yield postgres_1.prima.course.update({
                     where: { id: id, delet: false },
-                    data: updateCourserDto.values,
+                    data: { teacherId: updateCourserDto.teacher, name: updateCourserDto.name, description: updateCourserDto === null || updateCourserDto === void 0 ? void 0 : updateCourserDto.description },
                 });
                 if (course) {
                     res.json(course);
@@ -94,7 +97,7 @@ class CourseController {
             const { delet } = req.body;
             if (isNaN(id))
                 res.status(400).json({ error: "Id argument is not number " });
-            let course = postgres_1.prima.course.update({
+            let course = yield postgres_1.prima.course.update({
                 where: { id: id, delet: false },
                 data: { delet: true },
             });
