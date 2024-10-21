@@ -13,8 +13,7 @@ exports.StudentController = void 0;
 const postgres_1 = require("../../data/postgres");
 const dtos_1 = require("../../domain/dtos");
 class StudentController {
-    constructor(studentRepository) {
-        this.studentRepository = studentRepository;
+    constructor() {
         this.allStudents = (req, res) => __awaiter(this, void 0, void 0, function* () {
             const allStudent = yield postgres_1.prima.student.findMany({
                 where: { delet: false },

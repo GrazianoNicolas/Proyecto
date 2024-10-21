@@ -1,12 +1,12 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.StudentRepositoryImpl = void 0;
-class StudentRepositoryImpl {
+exports.CourseRepositoryImpl = void 0;
+class CourseRepositoryImpl {
     constructor(datasource) {
         this.datasource = datasource;
     }
-    create(createTodoDto) {
-        return this.datasource.create(createTodoDto);
+    create(createCourserDto) {
+        return this.datasource.create(createCourserDto);
     }
     getAll() {
         return this.datasource.getAll();
@@ -14,12 +14,11 @@ class StudentRepositoryImpl {
     findById(id) {
         return this.datasource.findById(id);
     }
-    updateById(updateStudentDto) {
-        return this.datasource.updateById(updateStudentDto);
+    updateById(updateCourseDto) {
+        return this.datasource.updateById(updateCourseDto);
     }
     deleteById(id) {
         return this.datasource.deleteById(id);
     }
 }
-exports.StudentRepositoryImpl = StudentRepositoryImpl;
-;
+exports.CourseRepositoryImpl = CourseRepositoryImpl;

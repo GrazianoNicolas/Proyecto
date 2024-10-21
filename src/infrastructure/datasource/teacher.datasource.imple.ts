@@ -7,7 +7,7 @@ import {
 } from "../../domain";
 import { prima } from "../../data/postgres";
 
-export class StudentDatasourceImpl implements TeacherDatasource {
+export class TeacherDatasourceImpl implements TeacherDatasource {
   async getAll(): Promise<TeacherEntity[]> {
     const allStudent = await prima.teacher.findMany({
       where: { delet: false },

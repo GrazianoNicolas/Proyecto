@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.StudentRepositoryImpl = void 0;
-class StudentRepositoryImpl {
+exports.RegistrationRepositoryImpl = void 0;
+class RegistrationRepositoryImpl {
     constructor(datasource) {
         this.datasource = datasource;
     }
@@ -21,5 +21,4 @@ class StudentRepositoryImpl {
         return this.datasource.deleteById(id);
     }
 }
-exports.StudentRepositoryImpl = StudentRepositoryImpl;
-;
+exports.RegistrationRepositoryImpl = RegistrationRepositoryImpl;

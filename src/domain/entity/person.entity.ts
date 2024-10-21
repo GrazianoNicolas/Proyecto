@@ -21,7 +21,7 @@ export class Person {
     if (!id) throw "Id is required";
     if (!name) throw "Name is required";
     if (!email) throw "Email is required";
-    if (!delet) throw "Delete is required";
+    //if (!delet) throw "Delete is required";
 
     return new Person(id, name, email, delet);
   }
