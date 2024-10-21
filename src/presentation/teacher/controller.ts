@@ -55,7 +55,6 @@ export class TeacheController {
       id,
     });
     if (error) res.status(400).json({ error });
-    console.log(updateTeacherDpo?.values);
 
     let teacher = await this.teacherRepository.updateById(updateTeacherDpo!);
 

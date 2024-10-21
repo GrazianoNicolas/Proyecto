@@ -2,7 +2,6 @@ import {Request, Response} from 'express';
 import { prima } from "../../data/postgres";
 import { CreateRegistrationDto, UpdateRegistrationDto } from '../../domain/dtos';
 import { error } from 'console';
-import { RegistrationRepository } from '../../domain';
 
 
 // !GET /cursos/:id/estudiantes: Listar los estudiantes inscritos en un curso específico por su id.
@@ -14,11 +13,12 @@ import { RegistrationRepository } from '../../domain';
 
 
 export class RegistrationController {
-  constructor(private readonly registrationRepository:RegistrationRepository) {}
+  constructor() {}
 
   public allRegistration = async (req: Request, res: Response) => {
-    const allStudent = await this.registrationRepository.getAll();
-    
+    const allStudent = await prima.registration.findMany({
+      where: { delet: false },
+    });
     res.json(allStudent);
   };
 
@@ -26,21 +26,18 @@ export class RegistrationController {
     const id = +req.params.id;
     if (isNaN(id))
       res.status(400).json({ error: "Id argument is not number " });
-      try {
-        const registration = await this.registrationRepository.findById(id);
-        res.json(registration);
-      } catch (error) {
-        res.status(400).json(error);
-      }
-    
 
-  
+    const registration = await prima.registration.findFirst({
+      where: { id: id, delet:false },
+    });
+
+    registration
+      ? res.json(registration)
+      : res.status(404).json({ error: "Error El estudiante no existe" });
   };
 
   public createRegistration = async (req: Request, res: Response) => {
-    const [error, createRegistrationDto] = CreateRegistrationDto.create(
-      req.body
-    );
+    const [error, createRegistrationDto] = CreateRegistrationDto.create( req.body );
     if (error) res.status(400).json({ error });
 
     //PREGUNTAR si existe el estudiante y el curso
@@ -53,19 +50,23 @@ export class RegistrationController {
       where: { id: createRegistrationDto!.student, delet: false },
     });
 
+
     if (student && course) {
+
       const registration = await prima.registration.findFirst({
         where: { studentId: student.id, courseId: course.id, delet: false },
       });
 
       if (!registration) {
-        const newregistration = await this.registrationRepository.create(
-          createRegistrationDto!
-        );
 
-        res.json(newregistration);
+          const newregistration = await prima.registration.create({
+            data: { studentId: student.id, courseId: course.id, delet: false },
+          });
+          
+          res.json(newregistration);
+
       } else {
-        res.status(409).json({ error: " ya existe una inscripcion" });
+          res.status(409).json({ error: " ya existe una inscripcion" });
       }
     } else {
       res.status(404).json({ error: " el estudiante o el curso  no existe" });
@@ -89,26 +90,36 @@ export class RegistrationController {
       where: { id: updateRegistrationDto!.student, delet: false },
     });
 
+
+      console.log(course);
+      console.log(student);
+
+
     if (student && course) {
-      //todo ME fijo si esta inscripto en una materia existente para que no halla duplicados
+      
+      //todo ME fijo si esta inscripto en una materia existente para que no se halla duplicados
       const olRregistrations = await prima.registration.findFirst({
         where: { studentId: student.id, courseId: course.id, delet: false },
       });
 
       if (!olRregistrations) {
-        const updateregistration = await this.registrationRepository.updateById(
-          updateRegistrationDto!);
-
-        if (updateregistration) {
-          res.json(updateregistration);
-        } else {
-          res.status(404).json({ error: " no se encontro la inscripcion " });
-        }
-      } else {
-        res.status(404).json({
-          error:
-            "ya tiene una inscripcion en ese curso, no puede haber dupliacdos",
+        const updateregistration = await prima.registration.update({
+          where: { id: id, delet: false },
+          data: { studentId: student.id, courseId: course.id },
         });
+
+        if (updateregistration){
+          res.json(updateregistration);
+        }else{
+          res.status(404).json({ error: " no se encontro la inscripcion " });
+        } 
+      } else {
+        res
+          .status(404)
+          .json({
+            error:
+              "ya tiene una inscripcion en ese curso, no puede haber dupliacdos",
+          });
       }
     } else {
       res.status(404).json({ error: " el estudiante o el curso  no existe" });
@@ -122,19 +133,26 @@ export class RegistrationController {
     if (isNaN(id))
       res.status(400).json({ error: "Id argument is not number " });
 
-    try {
+    try{
       let registration = await prima.registration.findFirst({
         where: { id: id, delet: false },
       });
+       console.log(registration);
       if (registration) {
-        let registration = await this.registrationRepository.deleteById(id);
+            let registration = await prima.registration.update({
+            where: { id: id, delet: false },
+            data: { delet: true },
+          });
+         
 
-        res.json(registration);
-      } else {
-        res.status(404).json({ error: " el registro no existe" });
-      }
-    } catch (error) {
-      res.status(500).json({ error: "problema con la conexion " });
+      res.json(registration);
+    } else {
+      res.status(404).json({ error: " el registro no existe" });
     }
-  };
+        
+  }catch(error){
+            res.status(500).json({ error: "problema con la conexion " });
+
+  }
+  };  
 }

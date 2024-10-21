@@ -10,6 +10,7 @@ export class CourseDatasourceImpl implements CourseDatasource {
         description: createCourseDto!.description,
         delet: false,
       },
+      include: { fk_teacher: true },
     });
     return Courses.fromObject(newCourse);
   }
@@ -17,6 +18,7 @@ export class CourseDatasourceImpl implements CourseDatasource {
   async getAll(): Promise<Courses[]> {
     const allCourse = await prima.course.findMany({
       where: { delet: false },
+      include: { fk_teacher: true },
     });
 
     return allCourse.map((course) => Courses.fromObject(course));
@@ -24,6 +26,7 @@ export class CourseDatasourceImpl implements CourseDatasource {
   async findById(id: number): Promise<Courses> {
     const course = await prima.course.findFirst({
       where: { id: id, delet: false },
+      include: { fk_teacher: true },
     });
 
     if (!course) {
@@ -41,6 +44,7 @@ export class CourseDatasourceImpl implements CourseDatasource {
         name: updateCourserDto!.name,
         description: updateCourserDto?.description,
       },
+      include: { fk_teacher: true },
     });
 
     return Courses.fromObject(course);
@@ -51,6 +55,7 @@ export class CourseDatasourceImpl implements CourseDatasource {
     let course = await prima.course.update({
       where: { id: id, delet: false },
       data: { delet: true },
+      include: { fk_teacher: true },
     });
 
     return Courses.fromObject(course);

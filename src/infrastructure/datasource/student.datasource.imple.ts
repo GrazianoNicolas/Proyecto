@@ -25,7 +25,6 @@ export class StudentDatasourceImpl implements StudentDatasource {
     if (!studentbyid) {
       throw new Error("no se encontro el estudiante ");
     }
-    console.log(studentbyid);
     return StudentEntity.fromObject(studentbyid);
   }
 

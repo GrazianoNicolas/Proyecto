@@ -10,23 +10,26 @@ export class RegistrationDatasourceImpl implements RegistrationDatasource {
          courseId: createTodoDto!.course,
          delet: false,
        },
+       include: { student: true, course: true },
      });
     return Registration.fromObject(newregistration);
   }
   async getAll(): Promise<Registration[]> {
     const allregistration = await prima.registration.findMany({
       where: { delet: false },
+      include: { student: true, course : true},
     });
-
     return allregistration.map((regis) => Registration.fromObject(regis));
   }
 
   async findById(id: number): Promise<Registration> {
     const registration = await prima.registration.findFirst({
       where: { id: id, delet: false },
+      include: { student: true, course: true },
     });
+    
     if (!registration) {
-      throw new Error("no se encontro el estudiante ");
+      throw new Error("no se encontro la inscripcion ");
     }
     return Registration.fromObject(registration);
   }
@@ -44,6 +47,7 @@ export class RegistrationDatasourceImpl implements RegistrationDatasource {
          studentId: updateRegistrationtDto.student,
          courseId: updateRegistrationtDto.course,
        },
+       include: { student: true, course: true },
      });
 
      return Registration.fromObject(updateregistration);
@@ -58,6 +62,7 @@ export class RegistrationDatasourceImpl implements RegistrationDatasource {
    let registration = await prima.registration.update({
      where: { id: id, delet: false },
      data: { delet: true },
+     include: { student: true, course: true },
    });
     return Registration.fromObject(registration);
   }

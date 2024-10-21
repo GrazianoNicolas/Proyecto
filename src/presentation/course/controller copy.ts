@@ -1,17 +1,18 @@
 import {Request, Response} from 'express';
 import { prima } from "../../data/postgres";
 import { CreateCourserDto, UpdateCourserDto } from '../../domain/dtos';
-import { CourseRepository } from '../../domain';
 
 
 export class CourseController {
-  constructor(private readonly courseRepository:CourseRepository) {}
-
+  constructor() {}
 
   public allCourse = async (req: Request, res: Response) => {
-    const allStudent = await this.courseRepository.getAll();
+    const allStudent = await prima.course.findMany({
+      where: { delet: false },
+    });
     res.json(allStudent);
   };
+
 
 
 
@@ -21,15 +22,15 @@ export class CourseController {
     if (isNaN(id))
       res.status(400).json({ error: "Id argument is not number " });
 
-    try {
-      const course = await this.courseRepository.findById(id);
+    const course = await prima.course.findFirst({
+      where: { id: id, delet:false },
+    });
 
-      res.status(200).json(course);
-     
-    } catch (erro) {
-      res.status(404).json( erro);
-    }
-  }
+    course
+      ? res.json(course)
+      : res.status(404).json({ error: "Error el curso no existe" });
+  };
+
 
 
 
@@ -54,11 +55,16 @@ export class CourseController {
           if (oldstudent) {
             res.status(404).json({ error: "el curso ya existe" });
           }else{
-              const newCourse = await this.courseRepository.create(
-                createCourseDto!
-              );
+              const newStudent = await prima.course.create({
+                data: {
+                  name: createCourseDto!.name,
+                  teacherId: createCourseDto!.teacher,
+                  description: createCourseDto!.description,
+                  delet: false,
+                },
+              });
 
-              res.status(200).json(newCourse);
+              res.status(200).json(newStudent);
           }
         }else{ 
           res.status(404).json({ error: "no existe el profesor " });
@@ -81,9 +87,13 @@ export class CourseController {
     console.log(teache);
     if (teache) {
 
-      const course = await this.courseRepository.updateById(updateCourserDto!);
+      const course = await prima.course.update({
+        where: { id: id, delet: false },
+        data: { teacherId: updateCourserDto!.teacher, name:updateCourserDto!.name, description:updateCourserDto?.description },
+      });
+
       if (course) {
-        res.status(200).json(course);
+        res.json(course);
       } else {
         res.status(404).json({ error: "Error el curso no existe" });
       }
@@ -94,11 +104,15 @@ export class CourseController {
 
   public deleteCourse = async (req: Request, res: Response) => {
     const id = +req.params.id;
+    const { delet } = req.body;
 
     if (isNaN(id))
       res.status(400).json({ error: "Id argument is not number " });
 
-    let course = await this.courseRepository.deleteById(id);
+    let course = await prima.course.update({
+      where: { id: id, delet: false },
+      data: { delet: true },
+    });
 
     if (course) {
       res.json(course);

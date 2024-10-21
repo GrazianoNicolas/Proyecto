@@ -42,7 +42,6 @@ export class StudentController {
       const oldstudent = await prima.student.findFirst({
         where: { email: createStudentDto!.email },
       });
-        console.log(oldstudent);
 
       if (oldstudent) {
         res.status(409).json({ error: "ya existe un estudiante con ese email" });
