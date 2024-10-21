@@ -45,8 +45,6 @@ class RegistrationController {
             const student = yield postgres_1.prima.student.findFirst({
                 where: { id: createRegistrationDto.student, delet: false },
             });
-            console.log(student);
-            console.log(course);
             if (student && course) {
                 const registration = yield postgres_1.prima.registration.findFirst({
                     where: { studentId: student.id, courseId: course.id, delet: false },
@@ -77,6 +75,8 @@ class RegistrationController {
             const student = yield postgres_1.prima.student.findFirst({
                 where: { id: updateRegistrationDto.student, delet: false },
             });
+            console.log(course);
+            console.log(student);
             if (student && course) {
                 //todo ME fijo si esta inscripto en una materia existente para que no se halla duplicados
                 const olRregistrations = yield postgres_1.prima.registration.findFirst({
@@ -111,15 +111,24 @@ class RegistrationController {
             const { delet } = req.body;
             if (isNaN(id))
                 res.status(400).json({ error: "Id argument is not number " });
-            let registration = yield postgres_1.prima.registration.update({
-                where: { id: id, delet: false },
-                data: { delet: true },
-            });
-            if (!registration) {
-                res.json(registration);
+            try {
+                let registration = yield postgres_1.prima.registration.findFirst({
+                    where: { id: id, delet: false },
+                });
+                console.log(registration);
+                if (registration) {
+                    let registration = yield postgres_1.prima.registration.update({
+                        where: { id: id, delet: false },
+                        data: { delet: true },
+                    });
+                    res.json(registration);
+                }
+                else {
+                    res.status(404).json({ error: " el registro no existe" });
+                }
             }
-            else {
-                res.status(404).json({ error: "Error el registro no existe" });
+            catch (error) {
+                res.status(500).json({ error: "problema con la conexion " });
             }
         });
     }

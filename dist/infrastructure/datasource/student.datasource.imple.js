@@ -26,23 +26,38 @@ class StudentDatasourceImpl {
             const studentbyid = yield postgres_1.prima.student.findFirst({
                 where: { id: id, delet: false },
             });
-            throw new Error("Method not implemented.");
-            //return StudentEntity.fromObject(studentbyid);
+            if (!studentbyid) {
+                throw new Error("no se encontro el estudiante ");
+            }
+            return domain_1.StudentEntity.fromObject(studentbyid);
         });
     }
-    create(createTodoDto) {
+    create(createStudentDto) {
         return __awaiter(this, void 0, void 0, function* () {
-            throw new Error("Method not implemented.");
+            const newStudent = yield postgres_1.prima.student.create({
+                data: { name: createStudentDto.name, email: createStudentDto.email },
+            });
+            return domain_1.StudentEntity.fromObject(newStudent);
         });
     }
     updateById(updateStudentDto) {
         return __awaiter(this, void 0, void 0, function* () {
-            throw new Error("Method not implemented.");
+            yield this.findById(updateStudentDto.id);
+            const updatedSudent = yield postgres_1.prima.student.update({
+                where: { id: updateStudentDto.id, delet: false },
+                data: updateStudentDto.values,
+            });
+            return domain_1.StudentEntity.fromObject(updatedSudent);
         });
     }
     deleteById(id) {
         return __awaiter(this, void 0, void 0, function* () {
-            throw new Error("Method not implemented.");
+            yield this.findById(id);
+            let deletStudent = yield postgres_1.prima.student.update({
+                where: { id: id, delet: false },
+                data: { delet: true },
+            });
+            return domain_1.StudentEntity.fromObject(deletStudent);
         });
     }
 }

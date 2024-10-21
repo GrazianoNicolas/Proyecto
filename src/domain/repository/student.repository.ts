@@ -5,7 +5,7 @@ export abstract class StudentRepository {
   abstract create(createTodoDto: CreateStudentDto): Promise<StudentEntity>;
 
   //todo paginacion
-  abstract getAll(): Promise<StudentEntity>;
+  abstract getAll(): Promise<StudentEntity[]>;
 
   abstract findById(id: number): Promise<StudentEntity>;
   abstract updateById(

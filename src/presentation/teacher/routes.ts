@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { TeacheController } from "./TeacherController";
+import { TeacheController } from "./controller";
 
 export class TeacheRoutes {
   static get routes(): Router {

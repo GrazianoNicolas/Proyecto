@@ -9,7 +9,18 @@ class Person {
         this.delet = delet;
     }
     static fromObject(object) {
+        if (!object) {
+            throw new Error("Object is required");
+        }
         const { id, name, email, delet } = object;
+        if (!id)
+            throw "Id is required";
+        if (!name)
+            throw "Name is required";
+        if (!email)
+            throw "Email is required";
+        if (!delet)
+            throw "Delete is required";
         return new Person(id, name, email, delet);
     }
 }
